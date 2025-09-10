@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: discord-bot
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
+    envVars:
+      - key: DISCORD_BOT_TOKEN
+        value: MTQxNTM1MzU3NTI2NTE0NDg1Mg.GR3al3.TUuvAGQ8S4mFAfnMj0lnmfwmdKZplqunNzb5Wk
