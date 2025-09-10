@@ -4,6 +4,7 @@ import aiohttp
 import os
 
 intents = discord.Intents.default()
+intents.message_content = True  # 👈 needed for reading messages
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 # HARDCODED cookies and headers (from your curl)
