@@ -2,12 +2,15 @@ import discord
 from discord.ext import commands
 import aiohttp
 import os
+import threading
+import uvicorn
+from fastapi import FastAPI
 
+# ----------- Discord Bot Setup -----------
 intents = discord.Intents.default()
-intents.message_content = True  # 👈 needed for reading messages
+intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-# HARDCODED cookies and headers (from your curl)
 HARDCODED_COOKIE_HEADER = (
     "_SplunkChallenge=MjEwLjIzLjIyNS4yMDI=; "
     "_SplunkChallengeHash=0nq9x3txgcyi; "
@@ -40,7 +43,6 @@ async def on_ready():
 
 @bot.command()
 async def refreshcookie(ctx, *, cookie_input: str):
-    """Refreshes cookie using hardcoded headers and user input."""
     url = 'https://app.beamers.si/api/bypasser'
     payload = {
         "action": "refresh_cookie",
@@ -61,5 +63,18 @@ async def refreshcookie(ctx, *, cookie_input: str):
             await ctx.send(f"❌ Error:\n```{e}```")
 
 
-# Run the bot
-bot.run(os.getenv("DISCORD_BOT_TOKEN"))
+# ----------- Fake Web Server for Render -----------
+app = FastAPI()
+
+@app.get("/")
+def home():
+    return {"status": "Bot is running!"}
+
+def run_server():
+    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+
+
+# ----------- Start both web server & bot -----------
+if __name__ == "__main__":
+    threading.Thread(target=run_server).start()
+    bot.run(os.getenv("DISCORD_BOT_TOKEN"))
